@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Week 1 Quiz Scenario-Based</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 28px; background:#f4f6fb; }
+    .container { max-width:760px; margin:auto; background:white; padding:26px; border-radius:12px; box-shadow:0 6px 20px rgba(18,38,63,0.08);}    
+    h2 { margin-top:0; }
+    .question { font-size:1.15rem; margin-bottom:12px; }
+    .options button { display:block; width:100%; margin:10px 0; padding:12px 14px; border-radius:10px; border:1px solid #d6dbe8; cursor:pointer; background:#fcfdff; text-align:left; transition:transform .18s ease, box-shadow .18s ease; }
+    .options button:hover { transform: translateY(-2px); box-shadow:0 6px 18px rgba(14,30,60,0.06); }
+    .options button.correctAnim { background:#e6fbef !important; border-color:#6ad07a !important; transform:scale(1.02); }
+    .options button.wrongAnim { background:#fff0f0 !important; border-color:#f07a7a !important; transform:scale(.995); }
+    .feedback { margin-top:14px; padding:14px; border-radius:10px; font-size:0.98rem; }
+    .correct { background:#e6fbef; border:1px solid #6ad07a; }
+    .wrong { background:#fff0f0; border:1px solid #f07a7a; }
+    #nextBtn { margin-top:18px; padding:10px 18px; border:none; border-radius:10px; background:#2d6cdf; color:white; cursor:pointer; font-weight:600; }
+    #result { font-size:1.15rem; margin-top:20px; padding:18px; background:#eef6ff; border-radius:12px; }
+
+    /* Progress Bar */
+    #progressContainer { width:100%; background:#e6e9ef; height:14px; border-radius:10px; margin-bottom:18px; overflow:hidden; }
+    #progressBar { height:100%; width:0%; background:linear-gradient(90deg,#2d6cdf,#61a7ff); border-radius:10px; transition:width 0.45s cubic-bezier(.2,.9,.3,1); }
+
+    /* Score animation */
+    .scorePulse { display:inline-block; padding:8px 12px; border-radius:999px; background:#fff; border:1px solid #e1e6f2; box-shadow:0 8px 18px rgba(45,108,223,0.12); transform-origin:center; animation:pop .6s ease; }
+    @keyframes pop { 0% { transform:scale(.6); opacity:0 } 60% { transform:scale(1.06); opacity:1 } 100% { transform:scale(1); } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Scenario-Based Data Analysis Quiz Week 1</h2>
+
+    <div id="progressContainer"><div id="progressBar"></div></div>
+
+    <div id="quizBox">
+      <div id="question" class="question"></div>
+      <div id="options" class="options"></div>
+      <div id="feedback"></div>
+      <button id="nextBtn" style="display:none;">Next Question</button>
+    </div>
+
+    <div id="result" style="display:none;"></div>
+  </div>
+
+<script>
+const quizData = [
+  {q:"1. An e-commerce company tracks its monthly sales revenue in dollars. Since a revenue of $0 represents an absolute absence of sales, what level of measurement is most appropriate for this data, allowing for all mathematical operations, including the calculation of meaningful ratios?", options:["A. Interval Data","B. Nominal Data","C. Ratio Data","D. Ordinal Data"], answer:2, explanation:"Ratio data has a true zero point (0 means an absolute absence of the quantity), which means ratios (e.g., this month is 2× last month) are meaningful and allowed."},
+  {q:"2. A retail chain's supply chain system not only forecasts future demand for a product (Predictive Analysis) but also automatically determines the optimal order quantity and delivery schedule for each warehouse. Which type of data analysis is this an example of?", options:["A. Descriptive Analysis","B. Diagnostic Analysis","C. Predictive Analysis","D. Prescriptive Analysis"], answer:3, explanation:"Prescriptive analysis goes beyond prediction by recommending a specific, optimized course of action (\"What should we do?\") to achieve the best outcome, such as maximizing availability while minimizing costs."},
+  {q:"3. A consumer electronics company analyzes millions of raw customer service transcripts, product review videos, and social media comments. This vast pool of text and video data is best classified as which type of data structure?", options:["A. Structured Data","B. Semi-structured Data","C. Unstructured Data","D. Discrete Data"], answer:2, explanation:"Unstructured data lacks a predefined data model and is difficult to store in a traditional row-and-column table format, which is characteristic of raw text, audio, and video files."},
+  {q:"4. An HR analyst reviewing employee tenure finds the CEO (who founded the company 40 years ago) is an extreme outlier. To report the 'typical' employee tenure accurately, which measure of central tendency would be the most representative and robust?", options:["A. Mode","B. Range","C. Mean","D. Median"], answer:3, explanation:"The Median is the middle value and is highly resistant to the influence of extreme outliers (skew), providing a more stable and representative measure of the 'typical' value when data is skewed."},
+  {q:"5. A city health department observes that ice cream sales increase in the same months that reported incidents of sunburn increase. The analyst concludes that ice cream consumption directly causes sunburn. This conclusion is a classic example of confusing:", options:["A. Standard Deviation with Variance","B. The Population with the Sample","C. Qualitative Data with Quantitative Data","D. Correlation with Causation"], answer:3, explanation:"Correlation (two variables moving together, often due to a third factor like summer) does not imply Causation (a direct mechanism where one variable influences the other)."},
+  {q:"6. In the final stage of the data analysis process, after performing complex analysis on customer churn factors, what skill is most critical for translating those findings into actionable strategic decisions for key non-technical stakeholders?", options:["A. Advanced Excel Modeling","B. Data Cleaning Fundamentals","C. Storytelling with Data","D. Calculating the Quartiles"], answer:2, explanation:"Storytelling with Data is critical for framing insights in a narrative that connects findings to the business problem and persuades the audience to act on the recommendations."},
+  {q:"7. A software company wants to understand user frustration with its interface. They decide to conduct direct, observed usability tests and proprietary interviews with a select group of users. The data collected directly from these activities is classified as:", options:["A. Secondary Data","B. Tertiary Data","C. Primary Data","D. Qualitative Data"], answer:2, explanation:"Primary data is collected firsthand by the analyst or organization specifically for the current, immediate research purpose (e.g., proprietary interviews or experiments)."},
+  {q:"8. A logistics manager compares two shipping routes. Both have an average (mean) delivery time of 3.0 days. Route A has a Standard Deviation of 0.2 days, while Route B has a Standard Deviation of 1.5 days. Which conclusion should the manager draw?", options:["A. Route A has a slower average delivery time than Route B.","B. Route B's delivery times are less variable and more reliable than Route A's.","C. Route A's delivery times are much more consistent and predictable than Route B's.","D. The correlation between the two routes' delivery times is positive."], answer:2, explanation:"Standard Deviation measures the spread or variability. A lower Standard Deviation (0.2 days) indicates less variability, translating directly to higher consistency and predictability (lower risk)."},
+  {q:"9. If an analyst has just defined the problem and collected the raw data from various sources, what is the next critical step before performing any sophisticated statistical modeling or machine learning?", options:["A. Final Communication and Visualization of Results","B. Data Cleaning (Wrangling) to handle missing values and inconsistencies","C. Defining the Problem/Framing the Question","D. Calculating the Mean and Mode"], answer:1, explanation:"Data Cleaning is the essential step immediately following collection. It ensures data quality and prevents the \"Garbage In, Garbage Out\" scenario that would result in flawed analysis."},
+  {q:"10. A market research firm uses a survey to classify a product's customer satisfaction using categories: 'Very Dissatisfied' through 'Very Satisfied'. While the order matters, the difference in 'satisfaction' between any two consecutive categories may not be equal. This type of data is classified as:", options:["A. Nominal Data","B. Ordinal Data","C. Discrete Data","D. Ratio Data"], answer:1, explanation:"Ordinal data has a natural, meaningful rank or order, but the intervals (the difference in 'distance' or magnitude) between the ranks are not uniform or meaningful."}
+];
+
+let current = 0;
+let score = 0;
+
+function updateProgressBar() {
+  const pct = Math.round((current / quizData.length) * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function loadQuestion() {
+  updateProgressBar();
+  const q = quizData[current];
+  document.getElementById('question').innerHTML = `<strong>${q.q}</strong>`;
+  const optBox = document.getElementById('options');
+  optBox.innerHTML = '';
+  document.getElementById('feedback').innerHTML = '';
+  document.getElementById('nextBtn').style.display = 'none';
+
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.innerHTML = `<span style="font-weight:600;margin-right:8px">${opt.substring(0,2)}</span> ${opt.substring(3)}`;
+    btn.onclick = () => selectAnswer(idx, btn);
+    optBox.appendChild(btn);
+  });
+}
+
+function selectAnswer(selected, btnElem) {
+  const q = quizData[current];
+  const feedback = document.getElementById('feedback');
+  if (selected === q.answer) {
+    score++;
+    feedback.className = 'feedback correct';
+    feedback.innerHTML = `<div class="scorePulse">Correct well reasoned.</div><div style="margin-top:10px">${q.explanation}</div>`;
+    btnElem.classList.add('correctAnim');
+  } else {
+    feedback.className = 'feedback wrong';
+    const correctLetter = String.fromCharCode(65 + q.answer);
+    feedback.innerHTML = `<strong>Incorrect.</strong> Correct answer: <strong>${correctLetter}</strong>.<div style="margin-top:8px">${q.explanation}</div>`;
+    btnElem.classList.add('wrongAnim');
+  }
+
+  document.querySelectorAll('#options button').forEach(b => b.disabled = true);
+  document.getElementById('nextBtn').style.display = 'inline-block';
+}
+
+document.getElementById('nextBtn').onclick = () => {
+  current++;
+  if (current < quizData.length) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
+};
+
+function showResult() {
+  document.getElementById('quizBox').style.display = 'none';
+  const out = document.getElementById('result');
+  out.style.display = 'block';
+  out.innerHTML = `<div style="font-size:1.12rem;margin-bottom:8px">You scored <strong>${score}</strong> out of <strong>${quizData.length}</strong>.</div>`;
+  const wrong = quizData.length - score;
+  out.innerHTML += `<div>Wrong answers: <strong>${wrong}</strong>.</div>`;
+  document.getElementById('progressBar').style.width = '100%';
+}
+
+updateProgressBar();
+loadQuestion();
+</script>
+</body>
+</html>
